@@ -25,7 +25,7 @@ def home():
     # Prepare data for rendering
     weekly_forecast = zip(dates, temp_max, temp_min)
 
-    return render_template('forecast.html', weekly_forecast=weekly_forecast)
+    return render_template('forecast.html', weekly_forecast=weekly_forecast, LATITUDE=LATITUDE, LONGITUDE=LONGITUDE)
 
 if __name__ == '__main__':
     app.run(debug=True)
