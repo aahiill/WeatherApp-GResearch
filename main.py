@@ -13,7 +13,7 @@ openmeteo = openmeteo_requests.Client(session = retry_session)
 # The order of variables in hourly or daily is important to assign them correctly below
 url = "https://api.open-meteo.com/v1/forecast"
 params = {
-	"latitude": 51.508,
+	"latitude": 51.5085,
 	"longitude": -0.1257,
 	"current": "temperature_2m",
 	"hourly": "temperature_2m",
