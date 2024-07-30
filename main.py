@@ -1,8 +1,8 @@
 import openmeteo_requests
-
 import requests_cache
 import pandas as pd
 from retry_requests import retry
+import math
 
 # Setup the Open-Meteo API client with cache and retry on error
 cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
@@ -16,7 +16,9 @@ params = {
 	"latitude": 51.5085,
 	"longitude": -0.1257,
 	"current": "temperature_2m",
-	"hourly": "temperature_2m"
+	"hourly": "temperature_2m",
+	"start_date": "2024-07-30",
+	"end_date": "2024-07-31",
 }
 responses = openmeteo.weather_api(url, params=params)
 
@@ -29,7 +31,7 @@ print(f"Timezone difference to GMT+0 {response.UtcOffsetSeconds()} s")
 
 # Current values. The order of variables needs to be the same as requested.
 current = response.Current()
-current_temperature_2m = current.Variables(0).Value()
+current_temperature_2m = round(current.Variables(0).Value(), 0)
 
 print(f"Current time {current.Time()}")
 print(f"Current temperature_2m {current_temperature_2m}")
@@ -38,13 +40,19 @@ print(f"Current temperature_2m {current_temperature_2m}")
 hourly = response.Hourly()
 hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
 
-hourly_data = {"date": pd.date_range(
-	start = pd.to_datetime(hourly.Time(), unit = "s", utc = True),
-	end = pd.to_datetime(hourly.TimeEnd(), unit = "s", utc = True),
-	freq = pd.Timedelta(seconds = hourly.Interval()),
-	inclusive = "left"
-)}
+hourly_temperature_2m = hourly_temperature_2m.astype(int)
+
+hourly_data = {
+    "date": pd.date_range(
+        start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
+        end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
+        freq=pd.Timedelta(seconds=hourly.Interval()),
+        inclusive="left"
+    )
+}
+
 hourly_data["temperature_2m"] = hourly_temperature_2m
 
-hourly_dataframe = pd.DataFrame(data = hourly_data)
+hourly_dataframe = pd.DataFrame(data=hourly_data)
+
 print(hourly_dataframe)
