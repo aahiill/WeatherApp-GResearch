@@ -10,13 +10,9 @@
     <div class="header-container">
         <div class="header-content">WEATHER</div>
         <div class="nav-buttons">
-            <div class="nav-button">Home</div>
-            <a href="{{ url_for('map') }}" class="nav-button">Map</a>
+            <a href="/" class="nav-button">Home</a>
+            <div class="nav-button">Map</div>
         </div>
-        <form action="/" method="get">
-            <input type="text" class="location-input-box" id="searchBar" name="location" placeholder="Enter location" value="{{ location }}">
-            <input type="submit" style="display: none;">
-        </form>
     </div>
     <!-- Rest of the HTML content -->
     <div class="city-name-container">
@@ -34,15 +30,15 @@
         </div>
     </div>
 
-    
+    <div class="content" id="map-container">
+        <iframe src="{{ url_for('osm') }}" style="width: 95vw; height: 90vh;"></iframe>
+    </div>
 
 
-
-
-
-    
-    <script>
-        // JavaScript content
-    </script>
 </body>
+
+<script>
+    // JavaScript content
+</script>
+
 </html>

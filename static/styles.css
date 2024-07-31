@@ -22,7 +22,7 @@ th {
 
 .header-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Center everything horizontally */
     align-items: center;
     width: 100%;
     padding: 20px;
@@ -30,13 +30,14 @@ th {
     top: 0;
     left: 0;
     background-color: rgb(43, 145, 240);
+    position: relative; /* Ensure relative positioning for children alignment */
 }
 
 .header-content {
     font-weight: bold;
     font-size: xx-large;
     color: white;
-    z-index: 1000;
+    margin-right: 20px; /* Add space between header content and nav buttons */
 }
 
 .nav-buttons {
@@ -151,4 +152,15 @@ th {
     border: 1px solid #ddd;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
     border-radius: 10%;
+}
+
+.map-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    width: 100vw;  /* Full viewport width */
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0; /* Optional: background color for contrast */
 }
