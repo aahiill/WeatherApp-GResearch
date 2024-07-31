@@ -40,6 +40,7 @@
     </div>
     
     <script>
+
         window.addEventListener('message', function(event) {
             if (event.data.latitude && event.data.longitude) {
                 fetchWeatherData(event.data.latitude, event.data.longitude);
@@ -91,6 +92,16 @@
                 return isLastDay ? `Next ${dayName}` : dayName;
             }
         }
+
+        /* Get day name from today and number of days after today */
+        function getDayName(daysAfterToday) {
+            var date = new Date();
+            date.setDate(date.getDate() + daysAfterToday);
+            var options = { weekday: 'long' };
+            var dayName = date.toLocaleDateString(undefined, options);
+            return dayName;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const dayBoxes = document.querySelectorAll('.day-box');
 
@@ -153,6 +164,13 @@
                 weatherContainer.appendChild(box);
             });
         });
+
+        document.getElementById('day-2').textContent = getDayName(1);
+        document.getElementById('day-3').textContent = getDayName(2);
+        document.getElementById('day-4').textContent = getDayName(3);
+        document.getElementById('day-5').textContent = getDayName(4);
+        document.getElementById('day-6').textContent = getDayName(5);
+        document.getElementById('day-7').textContent = getDayName(6);
     </script>
 </body>
 </html>
