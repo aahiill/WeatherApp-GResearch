@@ -1,25 +1,25 @@
-/* GENERAL SETTINGS */
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
     margin: 0;
     padding: 20px;
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
 }
+
 th, td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
+
 th {
     background-color: #f2f2f2;
 }
 
-/* TOP BLUE STRIP */
 .header-container {
     display: flex;
     justify-content: space-between;
@@ -32,7 +32,6 @@ th {
     background-color: rgb(43, 145, 240);
 }
 
-/* 'WEATHER' TEXT FOR TOP BLUE STRIP */
 .header-content {
     width: 48%;
     font-weight: bold;
@@ -41,7 +40,6 @@ th {
     z-index: 1000;
 }
 
-/* 'ENTER LOCATION' BOX */
 .location-input-box {
     width: 48%;
     padding: 10px;
@@ -50,7 +48,6 @@ th {
     font-size: large;
 }
 
-/* CITY NAME CONTAINER */
 .city-name-container {
     font-weight: bold;
     font-size: xx-large;
@@ -60,7 +57,6 @@ th {
     background-color: antiquewhite;
 }
 
-/* HOURLY VIEW */
 .hourly-view-container {
     font-weight: bold;
     font-size: xx-large;
@@ -70,13 +66,7 @@ th {
     padding: 20px;
 }
 
-/* Main Content */
-.main-content {
-    margin-top: 0;
-    padding: 20px;
-}
 
-/* CONTAINER HOLDING MAP TEMP CHART AND MAP WIDGETS */
 .dual-container {
     display: flex;
     justify-content: space-between;
@@ -84,12 +74,13 @@ th {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
-    background-color:#f0f0f0;
+    background-color: #f0f0f0;
 }
+
 .dual-container .content {
     width: 48%;
     height: auto;
-    background-color: #ff0000;
+    background-color: #ec1cff;
     padding: 10px;
 }
 
@@ -126,40 +117,20 @@ th {
     opacity: 0.7;
 }
 
-.styled-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 25px 0;
-    font-size: 0.9em;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-}
-.styled-table thead tr {
-    background-color: steelblue;
-    color: darkgoldenrod;
-    text-align: left;
-}
-.styled-table th, .styled-table td {
-    padding: 12px 15px;
-}
-.styled-table tbody tr {
-    border-bottom: 1px solid #dddddd;
-}
-.styled-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
-}
-.styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid steelblue;
-}
-.styled-table tbody tr.active-row {
-    font-weight: bold;
-    color: #009879;
+/* HOURLY VIEW */
+.weather-container {
+    display: flex;
+    padding: 10px;
 }
 
-.location-input-box {
-    float: right;
-    width: 45vw; /* Set the width as desired */
+.box {
+    flex: 1;
+    width: 100px; /* You can adjust this width as needed */
+    margin: 0 10px; /* Add horizontal margin for some spacing between boxes */
     padding: 10px;
-    margin-right: 0; /* Align exactly to the right edge */
-    box-sizing: border-box;
+    text-align: center;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    border-radius: 10%;
 }

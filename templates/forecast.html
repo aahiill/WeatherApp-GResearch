@@ -35,26 +35,6 @@
         </div>
     </div>
 
-        <div class="main-content">
-            <h1>Weekly Weather Forecast in {{ city }}</h1>
-            <table id="forecast-table" class="styled-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Max Temperature (°C)</th>
-                    <th>Min Temperature (°C)</th>
-                    <th>Total Rain (mm)</th>
-                    <th>Max Wind Speed (km/h)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data will be inserted here -->
-            </tbody>
-        </table>
-
-        </div>
-
-
         <div class="dual-container">
             <div class="content" id="graph-container">
                  <h1>---GRAPH---</h1>
@@ -66,21 +46,6 @@
     </body>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-        const dayBoxes = document.querySelectorAll('.day-box');
-
-        dayBoxes.forEach(box => {
-            box.addEventListener('click', () => {
-                dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
-                box.classList.add('selected');
-                dayBoxes.forEach(b => {
-                        if (!b.classList.contains('selected')) {
-                            b.classList.add('unselected');
-                        }
-                    });
-                });
-            });
-        });
 
         window.addEventListener('message', function(event) {
             if (event.data.latitude && event.data.longitude) {
@@ -133,5 +98,67 @@
                 return isLastDay ? `Next ${dayName}` : dayName;
             }
         }
+        document.addEventListener('DOMContentLoaded', () => {
+            const dayBoxes = document.querySelectorAll('.day-box');
+
+            dayBoxes.forEach(box => {
+                box.addEventListener('click', () => {
+                    dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
+                    box.classList.add('selected');
+                    dayBoxes.forEach(b => {
+                        if (!b.classList.contains('selected')) {
+                            b.classList.add('unselected');
+                        }
+                    });
+                });
+            });
+
+            const weatherData = [
+                { time: '1100', temp: '25°', icon: '☀️', precipitation: '0%', wind: '8' },
+                { time: '1200', temp: '26°', icon: '☀️', precipitation: '0%', wind: '9' },
+                { time: '1300', temp: '27°', icon: '☀️', precipitation: '0%', wind: '10' },
+                { time: '1400', temp: '27°', icon: '☀️', precipitation: '0%', wind: '11' },
+                { time: '1500', temp: '27°', icon: '☀️', precipitation: '0%', wind: '10' },
+                { time: '1600', temp: '28°', icon: '☀️', precipitation: '0%', wind: '10' },
+                { time: '1700', temp: '27°', icon: '☀️', precipitation: '0%', wind: '10' },
+                { time: '1800', temp: '26°', icon: '☀️', precipitation: '0%', wind: '10' },
+                { time: '1900', temp: '25°', icon: '☀️', precipitation: '0%', wind: '10' },
+                // Add more data up to 20 items
+            ];
+
+            const weatherContainer = document.getElementById('weatherContainer');
+
+            weatherData.forEach(data => {
+                const box = document.createElement('div');
+                box.className = 'box';
+
+                const time = document.createElement('div');
+                time.className = 'time';
+                time.textContent = data.time;
+                box.appendChild(time);
+
+                const temp = document.createElement('div');
+                temp.className = 'temp';
+                temp.textContent = data.temp;
+                box.appendChild(temp);
+
+                const icon = document.createElement('div');
+                icon.className = 'icon';
+                icon.textContent = data.icon;
+                box.appendChild(icon);
+
+                const precipitation = document.createElement('div');
+                precipitation.className = 'precipitation';
+                precipitation.textContent = data.precipitation;
+                box.appendChild(precipitation);
+
+                const wind = document.createElement('div');
+                wind.className = 'wind';
+                wind.textContent = data.wind;
+                box.appendChild(wind);
+
+                weatherContainer.appendChild(box);
+            });
+        });
     </script>
 </html>
