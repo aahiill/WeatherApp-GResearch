@@ -95,11 +95,25 @@
 
         /* Get day name from today and number of days after today */
         function getDayName(daysAfterToday) {
-            var date = new Date();
-            date.setDate(date.getDate() + daysAfterToday);
-            var options = { weekday: 'long' };
-            var dayName = date.toLocaleDateString(undefined, options);
-            return dayName;
+        var date = new Date();
+        date.setDate(date.getDate() + daysAfterToday);
+        var options = { weekday: 'long' };
+        var dayName = date.toLocaleDateString(undefined, options).slice(0,3);
+        var day = date.getDate();
+        var daySuffix = getDaySuffix(day);
+        return `${dayName} ${day}${daySuffix}`;
+        }
+
+        function getDaySuffix(day) {
+            if (day >= 11 && day <= 13) {
+                return 'th';
+            }
+            switch (day % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
