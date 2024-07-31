@@ -60,4 +60,23 @@
         </div>
     </div>
 </body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const dayBoxes = document.querySelectorAll('.day-box');
+
+    dayBoxes.forEach(box => {
+        box.addEventListener('click', () => {
+            dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
+            box.classList.add('selected');
+            dayBoxes.forEach(b => {
+                    if (!b.classList.contains('selected')) {
+                        b.classList.add('unselected');
+                    }
+                });
+            });
+        });
+    });
+</script>
+
 </html>

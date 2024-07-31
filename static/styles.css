@@ -27,7 +27,6 @@ th {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
-    background-color: #f0f0f0;
     top: 0;
     left: 0;
     background-color: rgb(43, 145, 240);
@@ -61,11 +60,6 @@ th {
     background-color: antiquewhite;
 }
 
-/* DAY PICKER */
-.day-picker-container {
-
-}
-
 /* HOURLY VIEW */
 .hourly-view-container {
     font-weight: bold;
@@ -78,7 +72,7 @@ th {
 
 /* Main Content */
 .main-content {
-    margin-top: 0px;
+    margin-top: 0;
     padding: 20px;
 }
 
