@@ -19,3 +19,4 @@ tzdata==2024.1
 url-normalize==1.4.3
 urllib3==2.2.2
 flask==3.0.0
+geopy==2.4.1

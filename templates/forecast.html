@@ -6,17 +6,17 @@
     <title>Weekly Weather Forecast</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-
-
 <body>
-
     <div class="header-container">
         <div class="header-content">Weather</div>
-        <input type="text" class="location-input-box" placeholder="Enter location...">
+        <form action="/" method="get">
+            <input type="text" class="location-input-box" id="searchBar" name="location" placeholder="Enter location..." value="{{ location }}">
+            <input type="submit" style="display: none;">
+        </form>
     </div>
     
     <div class="city-name-container">
-        {{city}}
+        {{ city }}
     </div>
 
     <div class="day-selector">
@@ -28,32 +28,29 @@
         <div class="day-box" id="day-6">Day 6</div>
         <div class="day-box" id="day-7">Day 7</div>
     </div>
-    <!---DAY PICKER--->
 
     <div class="hourly-view-container">
         ---HOURLY VIEW---
     </div>
 
-    <!-- Test table -->
     <div class="main-content">
-    <h1>Weekly Weather Forecast in {{city}}</h1>
-    <table>
-        <tr>    
-            <th>Date</th>
-            <th>Max Temperature (°C)</th>
-            <th>Min Temperature (°C)</th>
-        </tr>
-        {% for date, max_temp, min_temp in weekly_forecast %}
-        <tr>
-            <td>{{ date }}</td>
-            <td>{{ max_temp }}</td>
-            <td>{{ min_temp }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+        <h1>Weekly Weather Forecast in {{ city }}</h1>
+        <table>
+            <tr>    
+                <th>Date</th>
+                <th>Max Temperature (°C)</th>
+                <th>Min Temperature (°C)</th>
+            </tr>
+            {% for date, max_temp, min_temp in weekly_forecast %}
+            <tr>
+                <td>{{ date }}</td>
+                <td>{{ max_temp }}</td>
+                <td>{{ min_temp }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 
-    <!-- DUAL CONTAINER FOR CHART AND MAP-->
     <div class="dual-container">
         <div class="content" id="graph-container">
              <h1>---GRAPH---</h1>
@@ -63,24 +60,4 @@
         </div>
     </div>
 </body>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const dayBoxes = document.querySelectorAll('.day-box');
-
-    dayBoxes.forEach(box => {
-        box.addEventListener('click', () => {
-            dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
-            box.classList.add('selected');
-            dayBoxes.forEach(b => {
-                    if (!b.classList.contains('selected')) {
-                        b.classList.add('unselected');
-                    }
-                });
-            });
-        });
-    });
-
-    document.addEventListener()
-</script>
 </html>
