@@ -134,6 +134,7 @@ th {
 .day-box.selected {
     flex: 2; /* Expand selected box */
     background-color: #0056b3;
+    color: white;
 }
 
 .day-box.unselected {
