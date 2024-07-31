@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    <!-- Blue strip header -->
     <div class="header-container">
         <div class="header-content">WEATHER</div>
         <div class="nav-buttons">
@@ -18,11 +19,11 @@
             <input type="submit" style="display: none;">
         </form>
     </div>
-    <!-- Rest of the HTML content -->
+    <!-- Name of city -->
     <div class="city-name-container">
         {{ city }}
     </div>
-
+    <!-- Day picker -->
     <div class="day-selector">
         <div class="day-box" id="day-1">Today</div>
         <div class="day-box" id="day-2">Day 2</div>
@@ -32,15 +33,15 @@
         <div class="day-box" id="day-6">Day 6</div>
         <div class="day-box" id="day-7">Day 7</div>
     </div>
-
+    <!-- Name of city -->
     <div class="hourly-view-container">
         <div class="weather-container" id="weatherContainer">
             <!-- Boxes will be added here dynamically -->
         </div>
     </div>
     
-    <script>
 
+    <script>
         window.addEventListener('message', function(event) {
             if (event.data.latitude && event.data.longitude) {
                 fetchWeatherData(event.data.latitude, event.data.longitude);
@@ -70,6 +71,7 @@
             .catch(error => console.error('Error fetching weather data:', error));
         }
 
+        /* CHECK IF REDUNDANT */
         function getTodayDate() {
             var today = new Date();
             return today.toISOString().split('T')[0];
@@ -116,9 +118,9 @@
             }
         }
 
+        //Listener for day picker boxes and to change their selection status
         document.addEventListener('DOMContentLoaded', () => {
             const dayBoxes = document.querySelectorAll('.day-box');
-
             dayBoxes.forEach(box => {
                 box.addEventListener('click', () => {
                     dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
@@ -131,6 +133,7 @@
                 });
             });
 
+            // Data to be put in HOURLY view
             const weatherData = [
                 { time: '1100', temp: '25°', icon: '☀️', precipitation: '0%', wind: '8' },
                 { time: '1200', temp: '26°', icon: '☀️', precipitation: '0%', wind: '9' },
@@ -143,7 +146,8 @@
                 { time: '1900', temp: '25°', icon: '☀️', precipitation: '0%', wind: '10' },
                 // Add more data up to 20 items
             ];
-
+            
+            //Hourly weather container
             const weatherContainer = document.getElementById('weatherContainer');
 
             weatherData.forEach(data => {
