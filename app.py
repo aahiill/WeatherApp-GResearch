@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, make_response
 import requests
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry #fixed import error
 from geopy.geocoders import Nominatim
 from geopy.exc import GeopyError
 import logging
