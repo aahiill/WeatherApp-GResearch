@@ -64,12 +64,7 @@ th {
 
 /* DAY PICKER */
 .day-picker-container {
-    font-weight: bold;
-    font-size: xx-large;
-    color: black;
-    background-color: beige;
-    margin-top: 40px;
-    padding: 20px;
+
 }
 
 /* HOURLY VIEW */
@@ -103,4 +98,37 @@ th {
     height: auto;
     background-color: #ff0000;
     padding: 10px;
+}
+
+.day-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.day-box {
+    font-weight: bold;
+    font-size: xx-large;
+    color: black;
+    background-color: beige;
+    margin-top: 40px;
+    padding: 20px;
+    flex: 1;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.day-box:hover {
+    background-color: #0056b3;
+}
+
+.day-box.selected {
+    flex: 2; /* Expand selected box */
+    background-color: #0056b3;
+}
+
+.day-box.unselected {
+    flex: 1; /* Shrink unselected boxes */
+    opacity: 0.7;
 }
