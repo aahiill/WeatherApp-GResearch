@@ -89,6 +89,8 @@ def home():
         dates = forecast['time']
         temp_max = forecast['temperature_2m_max']
         temp_min = forecast['temperature_2m_min']
+        temp_precip = forecast['precipitation_sum']
+        temp_windspd = forecast['windspeed_10m_max']
 
         # Prepare data for rendering
         weekly_forecast = zip(dates, temp_max, temp_min)

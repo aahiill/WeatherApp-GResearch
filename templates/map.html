@@ -1,44 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Weather Forecast</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <div class="header-container">
+    <!-- Blue strip header -->
+    <div class="header-container main-header">
         <div class="header-content">WEATHER</div>
+        <form action="/" method="get" class="search-form">
+            <input type="text" class="location-input-box" id="searchBar" name="location" placeholder="Enter location..." value="{{ location }}">
+            <input type="submit" style="display: none;">
+        </form>
+    </div>
+    <!-- Invisible header for nav buttons -->
+    <div class="header-container nav-header">
         <div class="nav-buttons">
             <a href="/" class="nav-button">Home</a>
-            <div class="nav-button">Map</div>
+            <a href="{{ url_for('map') }}" class="nav-button">Map Search</a>
         </div>
     </div>
-    <!-- Rest of the HTML content -->
+    <!--container for weekly temp chart-->>
+    <div class="chart-container">
+        <canvas id="temperatureChart"></canvas>
+    </div>
     <div class="city-name-container">
         {{ city }}
     </div>
-
-    <div class="day-selector">
-        <!-- Day boxes -->
+    <div class="content" id="map-container">
+        <iframe src="{{ url_for('osm') }}" style="width: 98vw; height: 70vh;"></iframe>
     </div>
-
+    
+    <!-- Day picker -->
+    <div class="day-selector">
+        <div class="day-box" id="day-1">Today </div>
+        <div class="day-box" id="day-2"></div>
+        <div class="day-box" id="day-3"></div>
+        <div class="day-box" id="day-4"></div>
+        <div class="day-box" id="day-5"></div>
+        <div class="day-box" id="day-6"></div>
+        <div class="day-box" id="day-7"></div>
+    </div>
     <div class="hourly-view-container">
-        ---HOURLY VIEW---
         <div class="weather-container" id="weatherContainer">
             <!-- Boxes will be added here dynamically -->
         </div>
     </div>
 
-    <div class="content" id="map-container">
-        <iframe src="{{ url_for('osm') }}" style="width: 95vw; height: 70vh;"></iframe>
-    </div>
-
-
 </body>
 
 <script>
-    // JavaScript content
+    window.addEventListener('message', function (event) {
+        if (event.data.latitude && event.data.longitude) {
+            fetchWeatherData(event.data.latitude, event.data.longitude);
+        }
+    });
+
+    function fetchWeatherData(lat, lon) {
+        var url = `https://api.open-meteo.com/v1/forecast?
+        latitude=${lat}&longitude=${lon}&
+        daily=temperature_2m_max,
+        temperature_2m_min,
+        precipitation_sum,
+        windspeed_10m_max&
+        timezone=auto&
+        start_date=${getTodayDate()}&
+        end_date=${getEndDate(7)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                var tableBody = document.querySelector('#forecast-table tbody');
+                tableBody.innerHTML = '';
+                //variables for the graph
+                var dates = [];
+                var maxTemps = [];
+                var minTemps = [];
+                //update variables for the graph
+                data.daily.time.forEach((date, index) => {
+                    dates.push(formatDate(date, index === data.daily.time.length - 1));
+                    maxTemps.push(Math.round(data.daily.temperature_2m_max[index]));
+                    minTemps.push(Math.round(data.daily.temperature_2m_min[index]));
+                    // insert updated data into the table
+                    var row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${formatDate(date, index === data.daily.time.length - 1)}</td>
+                        <td>${Math.round(data.daily.temperature_2m_max[index])}</td>
+                        <td>${Math.round(data.daily.temperature_2m_min[index])}</td>
+                        <td>${Math.round(data.daily.precipitation_sum[index])}</td>
+                        <td>${Math.round(data.daily.windspeed_10m_max[index])}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                createTemperatureChart(dates, maxTemps, minTemps);
+            })
+            .catch(error => console.error('Error fetching weather data:', error));        
+        }
+
+    /* CHECK IF REDUNDANT */
+    function getTodayDate() {
+        var today = new Date();
+        return today.toISOString().split('T')[0];
+    }
+
+    function getEndDate(days) {
+        var endDate = new Date();
+        endDate.setDate(endDate.getDate() + days);
+        return endDate.toISOString().split('T')[0];
+    }
+
+    function formatDate(dateString, isLastDay) {
+        var date = new Date(dateString);
+        var today = new Date();
+        if (date.toDateString() === today.toDateString()) {
+            return "Today";
+        } else {
+            var options = { weekday: 'long' };
+            var dayName = date.toLocaleDateString(undefined, options);
+            return isLastDay ? `Next ${dayName}` : dayName;
+        }
+    }
+
+    /* Get day name from today and number of days after today */
+    function getDayName(daysAfterToday) {
+        var date = new Date();
+        date.setDate(date.getDate() + daysAfterToday);
+        var options = { weekday: 'long' };
+        var dayName = date.toLocaleDateString(undefined, options).slice(0, 3);
+        var day = date.getDate();
+        var daySuffix = getDaySuffix(day);
+        return `${dayName} ${day}${daySuffix}`;
+    }
+
+    function getDaySuffix(day) {
+        if (day >= 11 && day <= 13) {
+            return 'th';
+        }
+        switch (day % 10) {
+            case 1: return 'st';
+            case 2: return 'nd';
+            case 3: return 'rd';
+            default: return 'th';
+        }
+    }
+
+    //Listener for day picker boxes and to change their selection status
+    document.addEventListener('DOMContentLoaded', () => {
+        const dayBoxes = document.querySelectorAll('.day-box');
+        dayBoxes.forEach(box => {
+            box.addEventListener('click', () => {
+                dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
+                box.classList.add('selected');
+                dayBoxes.forEach(b => {
+                    if (!b.classList.contains('selected')) {
+                        b.classList.add('unselected');
+                    }
+                });
+            });
+        });
+
+        // Data to be put in HOURLY view
+        const weatherData = [
+            { time: '1100', temp: '25°', icon: '☀️', precipitation: '0%', wind: '8' },
+            { time: '1200', temp: '26°', icon: '☀️', precipitation: '0%', wind: '9' },
+            { time: '1300', temp: '27°', icon: '☀️', precipitation: '0%', wind: '10' },
+            { time: '1400', temp: '27°', icon: '☀️', precipitation: '0%', wind: '11' },
+            { time: '1500', temp: '27°', icon: '☀️', precipitation: '0%', wind: '10' },
+            { time: '1600', temp: '28°', icon: '☀️', precipitation: '0%', wind: '10' },
+            { time: '1700', temp: '27°', icon: '☀️', precipitation: '0%', wind: '10' },
+            { time: '1800', temp: '26°', icon: '☀️', precipitation: '0%', wind: '10' },
+            { time: '1900', temp: '25°', icon: '☀️', precipitation: '0%', wind: '10' },
+            // Add more data up to 20 items
+        ];
+
+        //Hourly weather container
+        const weatherContainer = document.getElementById('weatherContainer');
+
+        weatherData.forEach(data => {
+            const box = document.createElement('div');
+            box.className = 'box';
+
+            const time = document.createElement('div');
+            time.className = 'time';
+            time.textContent = data.time;
+            box.appendChild(time);
+
+            const temp = document.createElement('div');
+            temp.className = 'temp';
+            temp.textContent = data.temp;
+            box.appendChild(temp);
+
+            const icon = document.createElement('div');
+            icon.className = 'icon';
+            icon.textContent = data.icon;
+            box.appendChild(icon);
+
+            const precipitation = document.createElement('div');
+            precipitation.className = 'precipitation';
+            precipitation.textContent = data.precipitation;
+            box.appendChild(precipitation);
+
+            const wind = document.createElement('div');
+            wind.className = 'wind';
+            wind.textContent = data.wind;
+            box.appendChild(wind);
+
+            weatherContainer.appendChild(box);
+        });
+    });
+
+    /* Give day names to day boxes*/
+    document.getElementById('day-2').textContent = getDayName(1);
+    document.getElementById('day-3').textContent = getDayName(2);
+    document.getElementById('day-4').textContent = getDayName(3);
+    document.getElementById('day-5').textContent = getDayName(4);
+    document.getElementById('day-6').textContent = getDayName(5);
+    document.getElementById('day-7').textContent = getDayName(6);
+
+    /* Select Today by default*/
+    document.getElementById('day-1').classList.add('selected');
 </script>
 
 </html>
