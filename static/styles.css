@@ -1,0 +1,106 @@
+/* GENERAL SETTINGS */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+th {
+    background-color: #f2f2f2;
+}
+
+/* TOP BLUE STRIP */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #f0f0f0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgb(43, 145, 240);
+}
+
+/* 'WEATHER' TEXT FOR TOP BLUE STRIP */
+.header-content {
+    width: 48%;
+    font-weight: bold;
+    font-size: xx-large;
+    color: white;
+    z-index: 1000;
+}
+
+/* 'ENTER LOCATION' BOX */
+.location-input-box {
+    width: 48%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: large;
+}
+
+/* CITY NAME CONTAINER */
+.city-name-container {
+    font-weight: bold;
+    font-size: xx-large;
+    color: black;
+    margin-top: 100px;
+    padding: 20px;
+    background-color: antiquewhite;
+}
+
+/* DAY PICKER */
+.day-picker-container {
+    font-weight: bold;
+    font-size: xx-large;
+    color: black;
+    background-color: beige;
+    margin-top: 40px;
+    padding: 20px;
+}
+
+/* HOURLY VIEW */
+.hourly-view-container {
+    font-weight: bold;
+    font-size: xx-large;
+    color: black;
+    background-color: beige;
+    margin-top: 40px;
+    padding: 20px;
+}
+
+/* Main Content */
+.main-content {
+    margin-top: 0px;
+    padding: 20px;
+}
+
+/* CONTAINER HOLDING MAP TEMP CHART AND MAP WIDGETS */
+.dual-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color:#f0f0f0;
+}
+.dual-container .content {
+    width: 48%;
+    height: auto;
+    background-color: #ff0000;
+    padding: 10px;
+}

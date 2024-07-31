@@ -4,34 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Weather Forecast</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
+
 <body>
-    <table>
 
-    </table>
+    <div class="header-container">
+        <div class="header-content">Weather</div>
+        <input type="text" class="location-input-box" placeholder="Enter location...">
+    </div>
+    
+    <div class="city-name-container">
+        London
+    </div>
 
+    <div class="day-picker-container">
+        ---DAY PICKER---
+    </div>
 
-    <h1>Weekly Weather Forecast</h1>
+    <div class="hourly-view-container">
+        ---HOURLY VIEW---
+    </div>
+
+    <!-- Test table -->
+    <div class="main-content">
+    <h1>Weekly Weather Forecast in {{LATITUDE, LONGITUDE}}</h1>
     <table>
         <tr>
             <th>Date</th>
@@ -46,18 +44,16 @@
         </tr>
         {% endfor %}
     </table>
+    </div>
 
-    <!-- Placeholder for temp chart and Map -->
-    <table>
-        <tr>
-            <td>
-                <!-- CHART -->
-            </td>
-            <td>
-                <!-- MAP -->
-            </td>
-        </tr>
-    </table>
-
+    <!-- DUAL CONTAINER FOR CHART AND MAP-->
+    <div class="dual-container">
+        <div class="content" id="graph-container">
+             <h1>---GRAPH---</h1>
+        </div>
+        <div class="content" id="map-container">
+            <h1>---MAP---</h1>
+        </div>
+    </div>
 </body>
 </html>
