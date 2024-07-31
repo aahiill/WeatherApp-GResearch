@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OSM</title>
+    <style>
+        #map {
+            height: 500px;
+            width: 800px;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<div id="map" style="height: 500px;"></div>
+<script>
+  var map = L.map('map').setView([51.505, -0.09], 13);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  var marker = L.marker([51.505, -0.09], { draggable: true }).addTo(map);
+
+  function onMarkerDragEnd(e) {
+    var latlng = e.target.getLatLng();
+    // alert("Coordinates: " + latlng.lat + ", " + latlng.lng);
+    console.log(latlng.lat, latlng.lng);
+    window.parent.postMessage({ latitude: latlng.lat, longitude: latlng.lng }, '*');
+  }
+
+  marker.on('dragend', onMarkerDragEnd);
+</script>
+</body>
+</html>

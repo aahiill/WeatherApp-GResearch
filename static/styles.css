@@ -126,19 +126,40 @@ th {
     opacity: 0.7;
 }
 
-/* HOURLY VIEW */
-.weather-container {
-    display: flex;
-    padding: 10px;
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+.styled-table thead tr {
+    background-color: steelblue;
+    color: darkgoldenrod;
+    text-align: left;
+}
+.styled-table th, .styled-table td {
+    padding: 12px 15px;
+}
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid steelblue;
+}
+.styled-table tbody tr.active-row {
+    font-weight: bold;
+    color: #009879;
 }
 
-.box {
-    flex: 1;
-    width: 100px; /* You can adjust this width as needed */
-    margin: 0 10px; /* Add horizontal margin for some spacing between boxes */
+.location-input-box {
+    float: right;
+    width: 45vw; /* Set the width as desired */
     padding: 10px;
-    text-align: center;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    margin-right: 0; /* Align exactly to the right edge */
+    box-sizing: border-box;
 }
