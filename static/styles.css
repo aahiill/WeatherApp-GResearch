@@ -125,3 +125,20 @@ th {
     flex: 1; /* Shrink unselected boxes */
     opacity: 0.7;
 }
+
+/* HOURLY VIEW */
+.weather-container {
+    display: flex;
+    padding: 10px;
+}
+
+.box {
+    flex: 1;
+    width: 100px; /* You can adjust this width as needed */
+    margin: 0 10px; /* Add horizontal margin for some spacing between boxes */
+    padding: 10px;
+    text-align: center;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
