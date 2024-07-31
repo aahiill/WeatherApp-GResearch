@@ -1,82 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Weather Forecast</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <div class="header-container">
-        <div class="header-content">Weather</div>
-        <form action="/" method="get">
-            <input type="text" class="location-input-box" id="searchBar" name="location" placeholder="Enter location..." value="{{ location }}">
-            <input type="submit" style="display: none;">
-        </form>
-    </div>
-    
-    <div class="city-name-container">
-        {{ city }}
-    </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Weekly Weather Forecast</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        <div class="header-container">
+            <div class="header-content">Weather</div>
+            <form action="/" method="get">
+                <input type="text" class="location-input-box" id="searchBar" name="location" placeholder="Enter location..." value="{{ location }}">
+                <input type="submit" style="display: none;">
+            </form>
+        </div>
+        <div class="city-name-container">
+            {{ city }}
+        </div>
 
-    <div class="day-selector">
-        <div class="day-box" id="day-1">Day 1</div>
-        <div class="day-box" id="day-2">Day 2</div>
-        <div class="day-box" id="day-3">Day 3</div>
-        <div class="day-box" id="day-4">Day 4</div>
-        <div class="day-box" id="day-5">Day 5</div>
-        <div class="day-box" id="day-6">Day 6</div>
-        <div class="day-box" id="day-7">Day 7</div>
-    </div>
+        <div class="day-selector">
+            <div class="day-box" id="day-1">Day 1</div>
+            <div class="day-box" id="day-2">Day 2</div>
+            <div class="day-box" id="day-3">Day 3</div>
+            <div class="day-box" id="day-4">Day 4</div>
+            <div class="day-box" id="day-5">Day 5</div>
+            <div class="day-box" id="day-6">Day 6</div>
+            <div class="day-box" id="day-7">Day 7</div>
+        </div>
 
-    <div class="hourly-view-container">
-        ---HOURLY VIEW---
-    </div>
+        <div class="hourly-view-container">
+            ---HOURLY VIEW---
+        </div>
 
-    <div class="main-content">
-        <h1>Weekly Weather Forecast in {{ city }}</h1>
-        <table>
-            <tr>    
-                <th>Date</th>
-                <th>Max Temperature (°C)</th>
-                <th>Min Temperature (°C)</th>
-            </tr>
-            {% for date, max_temp, min_temp in weekly_forecast %}
-            <tr>
-                <td>{{ date }}</td>
-                <td>{{ max_temp }}</td>
-                <td>{{ min_temp }}</td>
-            </tr>
-            {% endfor %}
+        <div class="main-content">
+            <h1>Weekly Weather Forecast in {{ city }}</h1>
+            <table id="forecast-table" class="styled-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Max Temperature (°C)</th>
+                    <th>Min Temperature (°C)</th>
+                    <th>Total Rain (mm)</th>
+                    <th>Max Wind Speed (km/h)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be inserted here -->
+            </tbody>
         </table>
-    </div>
 
-    <div class="dual-container">
-        <div class="content" id="graph-container">
-             <h1>---GRAPH---</h1>
         </div>
-        <div class="content" id="map-container">
-            <h1>---MAP---</h1>
+
+
+        <div class="dual-container">
+            <div class="content" id="graph-container">
+                 <h1>---GRAPH---</h1>
+            </div>
+            <div class="content" id="map-container">
+                <iframe src="{{ url_for('osm') }}" height="500" width="100%"></iframe>
+            </div>
         </div>
-    </div>
-</body>
+    </body>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const dayBoxes = document.querySelectorAll('.day-box');
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const dayBoxes = document.querySelectorAll('.day-box');
 
-    dayBoxes.forEach(box => {
-        box.addEventListener('click', () => {
-            dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
-            box.classList.add('selected');
-            dayBoxes.forEach(b => {
-                    if (!b.classList.contains('selected')) {
-                        b.classList.add('unselected');
-                    }
+        dayBoxes.forEach(box => {
+            box.addEventListener('click', () => {
+                dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
+                box.classList.add('selected');
+                dayBoxes.forEach(b => {
+                        if (!b.classList.contains('selected')) {
+                            b.classList.add('unselected');
+                        }
+                    });
                 });
             });
         });
-    });
-</script>
 
+        window.addEventListener('message', function(event) {
+            if (event.data.latitude && event.data.longitude) {
+                fetchWeatherData(event.data.latitude, event.data.longitude);
+            }
+        });
+
+        function fetchWeatherData(lat, lon) {
+            var url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=auto&start_date=${getTodayDate()}&end_date=${getEndDate(7)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    var tableBody = document.querySelector('#forecast-table tbody');
+                    tableBody.innerHTML = '';
+                    data.daily.time.forEach((date, index) => {
+                        var row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${formatDate(date, index === data.daily.time.length - 1)}</td>
+                            <td>${Math.round(data.daily.temperature_2m_max[index])}</td>
+                            <td>${Math.round(data.daily.temperature_2m_min[index])}</td>
+                            <td>${Math.round(data.daily.precipitation_sum[index])}</td>
+                            <td>${Math.round(data.daily.windspeed_10m_max[index])}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+            .catch(error => console.error('Error fetching weather data:', error));
+        }
+
+        function getTodayDate() {
+            var today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        function getEndDate(days) {
+            var endDate = new Date();
+            endDate.setDate(endDate.getDate() + days);
+            return endDate.toISOString().split('T')[0];
+        }
+
+        function formatDate(dateString, isLastDay) {
+            var date = new Date(dateString);
+            var today = new Date();
+            if (date.toDateString() === today.toDateString()) {
+                return "Today";
+            } else {
+                var options = { weekday: 'long' };
+                var dayName = date.toLocaleDateString(undefined, options);
+                return isLastDay ? `Next ${dayName}` : dayName;
+            }
+        }
+    </script>
 </html>
