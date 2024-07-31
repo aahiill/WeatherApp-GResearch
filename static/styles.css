@@ -33,15 +33,34 @@ th {
 }
 
 .header-content {
-    width: 48%;
     font-weight: bold;
     font-size: xx-large;
     color: white;
     z-index: 1000;
 }
 
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    text-decoration: none;
+    color: white;
+    background-color: #0056b3;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: large;
+    transition: background-color 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: #003d80;
+}
+
 .location-input-box {
-    width: 48%;
+    width: 30vw;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -65,7 +84,6 @@ th {
     margin-top: 40px;
     padding: 20px;
 }
-
 
 .dual-container {
     display: flex;
