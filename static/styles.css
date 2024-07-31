@@ -20,29 +20,33 @@ th {
     background-color: #f2f2f2;
 }
 
+/* TOP BLUE STRIP */
 .header-container {
     display: flex;
-    justify-content: center; /* Center everything horizontally */
+    justify-content: center;
     align-items: center;
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
+    background-color: #f0f0f0;
+    position: fixed;
     top: 0;
     left: 0;
     background-color: rgb(43, 145, 240);
-    position: relative; /* Ensure relative positioning for children alignment */
 }
 
+/* 'WEATHER' TEXT FOR TOP BLUE STRIP */
 .header-content {
+    width: 48%;
     font-weight: bold;
     font-size: xx-large;
     color: white;
-    margin-right: 20px; /* Add space between header content and nav buttons */
+    z-index: 1000;
 }
 
 .nav-buttons {
     display: flex;
-    gap: 10px;
+    gap: 0px;
 }
 
 .nav-button {
@@ -50,6 +54,7 @@ th {
     color: white;
     background-color: #0056b3;
     padding: 10px 20px;
+    margin-right: 20px;
     border-radius: 5px;
     font-weight: bold;
     font-size: large;
@@ -154,13 +159,3 @@ th {
     border-radius: 10%;
 }
 
-.map-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh; /* Full viewport height */
-    width: 100vw;  /* Full viewport width */
-    margin: 0;
-    padding: 0;
-    background-color: #f0f0f0; /* Optional: background color for contrast */
-}
