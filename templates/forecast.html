@@ -46,8 +46,7 @@
     
 
     <script>
-        var selectedDate = getTodayDate()
-        console.log(selectedDate)
+        var selectedDate = getTodayDate();
 
         window.addEventListener('message', function(event) {
             if (event.data.latitude && event.data.longitude) {
@@ -135,6 +134,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             const dayBoxes = document.querySelectorAll('.day-box');
             dayBoxes.forEach(box => {
+                //FIX SETTING BUTTON CLICKED TO VARIABLE WITH SELECTED DATE
+
                 box.addEventListener('click', () => {
                     dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
                     box.classList.add('selected');
@@ -143,6 +144,8 @@
                             b.classList.add('unselected');
                         }
                     });
+
+                    //selectedDate = box.getAttribute('data-date'); FIXXXXXXXXX
                 });
             });
 

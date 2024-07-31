@@ -93,7 +93,7 @@ def home():
         temp_windspd = forecast['windspeed_10m_max']
 
         # Prepare data for rendering
-        weekly_forecast = zip(dates, temp_max, temp_min)
+        weekly_forecast = zip(dates, temp_max, temp_min, temp_precip, temp_windspd)
         city = get_city(latitude, longitude)
         logging.debug(f"City and country for coordinates ({latitude}, {longitude}): {city}")
 
@@ -118,6 +118,21 @@ def osm():
 @app.route('/map')
 def map():
     return render_template('map.html')
+
+@app.route('/get_city_name', methods=['GET'])
+def get_city_name():
+    lat = request.args.get('latitude')
+    lon = request.args.get('longitude')
+    
+    if lat and lon:
+        try:
+            latitude = float(lat)
+            longitude = float(lon)
+            city_name = get_city(latitude, longitude)
+            return {'city': city_name}
+        except ValueError:
+            return {'error': 'Invalid coordinates'}, 400
+    return {'error': 'Coordinates not provided'}, 400
 
 if __name__ == '__main__':
     app.run(debug=True)
