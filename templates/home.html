@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Weather Forecast</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <!-- Blue strip header -->
+    <div class="header-container main-header">
+        <div class="header-content">WEATHER</div>
+        <form class="search-form" id="searchForm">
+            <input type="text" class="location-input-box" id="searchBar" name="location" placeholder="Enter location...">
+            <input type="submit" style="display: none;">
+        </form>
+    </div>
+    <!-- Invisible header for nav buttons -->
+    <div class="header-container nav-header">
+        <div class="nav-buttons">
+            <div class="nav-button">Home</div>
+            <a href="{{ url_for('map') }}" class="nav-button">Map Search</a>
+        </div>
+    </div>
+    <!-- Name of city -->
+    <div class="city-name-container" id="cityDisplay">
+    </div>
+    <!-- Day picker -->
+    <div class="day-selector">
+        <div class="day-box" id="day-1">Today</div>
+        <div class="day-box" id="day-2"></div>
+        <div class="day-box" id="day-3"></div>
+        <div class="day-box" id="day-4"></div>
+        <div class="day-box" id="day-5"></div>
+        <div class="day-box" id="day-6"></div>
+        <div class="day-box" id="day-7"></div>
+    </div>
+    <!-- Hourly view container -->
+    <div class="hourly-view-container">
+        <div class="weather-container" id="weatherContainer">
+            <!-- Boxes will be added here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        var selectedDate = getTodayDate();
+        var currentLatitude = null;
+        var currentLongitude = null;
+
+        function getTodayDate() {
+            var today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        function getFutureDate(days) {
+            var futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + days);
+            return futureDate.toISOString().split('T')[0];
+        }
+
+        function formatDate(dateString) {
+            var date = new Date(dateString);
+            var options = { weekday: 'long', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString(undefined, options);
+        }
+
+        function getDayName(daysAfterToday) {
+            var date = new Date();
+            date.setDate(date.getDate() + daysAfterToday);
+            var options = { weekday: 'long' };
+            var dayName = date.toLocaleDateString(undefined, options).slice(0, 3);
+            var day = date.getDate();
+            var daySuffix = getDaySuffix(day);
+            return `${dayName} ${day}${daySuffix}`;
+        }
+
+        function getDaySuffix(day) {
+            if (day >= 11 && day <= 13) {
+                return 'th';
+            }
+            switch (day % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const dayBoxes = document.querySelectorAll('.day-box');
+            dayBoxes.forEach((box, index) => {
+                const date = getFutureDate(index);
+                box.setAttribute('data-date', date);
+                box.textContent = index === 0 ? "Today" : getDayName(index);
+
+                box.addEventListener('click', () => {
+                    dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
+                    box.classList.add('selected');
+                    dayBoxes.forEach(b => {
+                        if (!b.classList.contains('selected')) {
+                            b.classList.add('unselected');
+                        }
+                    });
+
+                    selectedDate = box.getAttribute('data-date');
+
+                    if (currentLatitude && currentLongitude) {
+                        fetchWeatherDataHourly(currentLatitude, currentLongitude, selectedDate);
+                    }
+                });
+            });
+
+            document.getElementById('day-1').click();
+        });
+
+        async function fetchWeatherDataHourly(lat, lon, date) {
+            try {
+                const response = await fetch(`/getHourlyWeather?latitude=${lat}&longitude=${lon}&date=${date}`);
+                const data = await response.json();
+                const weatherContainer = document.getElementById('weatherContainer');
+                weatherContainer.innerHTML = '';
+
+                data.hourly.time.forEach((time, index) => {
+                    const box = document.createElement('div');
+                    box.className = 'box';
+
+                    const timeDiv = document.createElement('div');
+                    timeDiv.className = 'time';
+                    timeDiv.textContent = new Date(time).getHours() + ':00';
+                    box.appendChild(timeDiv);
+
+                    const tempDiv = document.createElement('div');
+                    tempDiv.className = 'temp';
+                    tempDiv.textContent = `${Math.round(data.hourly.temperature_2m[index])}°C`;
+                    box.appendChild(tempDiv);
+
+                    const precipDiv = document.createElement('div');
+                    precipDiv.className = 'precipitation';
+                    precipDiv.textContent = `${Math.round(data.hourly.precipitation_sum[index])} mm`;
+                    box.appendChild(precipDiv);
+
+                    const windDiv = document.createElement('div');
+                    windDiv.className = 'wind';
+                    windDiv.textContent = `${Math.round(data.hourly.windspeed_10m[index])} km/h`;
+                    box.appendChild(windDiv);
+
+                    weatherContainer.appendChild(box);
+                });
+            } catch (error) {
+                console.error('Error fetching hourly weather data:', error);
+            }
+        }
+
+        const searchBar = document.getElementById('searchBar');
+        searchBar.addEventListener('keydown', async function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+
+                const inputVal = searchBar.value;
+                try {
+                    const response = await fetch(`/getCoords?city_name=${inputVal}`);
+                    const data = await response.json();
+                    const { latitude, longitude } = data;
+
+                    currentLatitude = latitude;
+                    currentLongitude = longitude;
+
+                    const cityNameResponse = await fetch(`/get_city_name?latitude=${latitude}&longitude=${longitude}`);
+                    const cityNameData = await cityNameResponse.json();
+                    const cityName = cityNameData.city;
+
+                    const cityNameContainer = document.getElementById('cityDisplay');
+                    cityNameContainer.textContent = cityName;
+
+                    fetchWeatherDataHourly(latitude, longitude, selectedDate);
+                } catch (error) {
+                    console.error('Error fetching coordinates or city name:', error);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
