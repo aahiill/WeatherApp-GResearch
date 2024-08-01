@@ -198,3 +198,34 @@ th {
     font-size: 27px;
     color: rgb(106, 106, 106);
 }
+
+/* Styles for the location button */
+.location-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px; /* Add padding around the button */
+    margin-left: 10px; /* Space between search bar and button */
+    border-radius: 5px; /* Optional: rounded corners */
+    border: 2px solid #0056b3; /* Border around the button */
+    background-color: #0056b3; /* Darker blue background for button */
+}
+
+/* Style for the marker icon */
+.location-button img {
+    width: 24px; /* Adjust size as needed */
+    height: auto;
+    padding: 5px; /* Padding inside the image, making the border more visible */
+}
+
+/* Search icon styling */
+.search-icon {
+    position: absolute; /* Position the icon absolutely within the container */
+    right: 10px; /* Position the icon 10 pixels from the right edge */
+    top: 50%; /* Vertically center the icon */
+    transform: translateY(-50%); /* Adjust for vertical centering */
+    width: 24px; /* Set the size of the icon */
+    height: 24px; /* Ensure height matches the width */
+    object-fit: contain; /* Maintain aspect ratio */
+    margin-left: 0
+}
