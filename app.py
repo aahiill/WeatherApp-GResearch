@@ -87,7 +87,6 @@ def home():
 
         weekly_forecast = zip(dates, temp_max, temp_min, temp_precip, temp_windspd)
         city = get_city(latitude, longitude)
-        logging.debug(f"City and country for coordinates ({latitude}, {longitude}): {city}")
 
         response = make_response(render_template('home.html', weekly_forecast=weekly_forecast, city=city, location=location))
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
@@ -112,6 +111,10 @@ def map():
 def osm_widget():
     return render_template('osm_widget.html')
 
+@app.route('/chart')
+def chart():
+    return render_template('chart.html')
+
 @app.route('/get_city_name', methods=['GET'])
 def get_city_name():
     lat = request.args.get('latitude')
@@ -135,7 +138,7 @@ def get_coords_endpoint():
         if latitude is not None and longitude is not None:
             return jsonify({'latitude': latitude, 'longitude': longitude})
         else:
-            return jsonify({'error': 'Location not found'}), 404
+            return jsonify({'latitude': '51.5', 'longitude': '0.12'}), 200
     return jsonify({'error': 'City name not provided'}), 400
 
 @app.route('/getHourlyWeather', methods=['GET'])
@@ -157,24 +160,27 @@ def get_hourly_weather():
             url = (
                 f"https://api.open-meteo.com/v1/forecast"
                 f"?latitude={latitude}&longitude={longitude}"
-                f"&hourly=temperature_2m,precipitation_sum,windspeed_10m"
+                f"&hourly=temperature_2m,windspeed_10m,weather_code"
                 f"&start_date={date}&end_date={date}"
                 f"&timezone=auto"
             )
-
+            
             response = session.get(url)
-            response.raise_for_status()
+            response.raise_for_status()  # This will raise an error for HTTP codes 4xx/5xx
             data = response.json()
 
-            return jsonify(data)
+            if 'hourly' in data and data['hourly']:
+                return jsonify(data)
+            else:
+                return jsonify({'error': 'No hourly data available'}), 500
 
-        except ValueError:
+        except ValueError as e:
             return jsonify({'error': 'Invalid coordinates'}), 400
         except requests.exceptions.RequestException as e:
-            logging.error(f"RequestException: {e}")
             return jsonify({'error': 'Error fetching weather data'}), 500
+    else:
+        return jsonify({'error': 'Coordinates or date not provided'}), 400
 
-    return jsonify({'error': 'Coordinates or date not provided'}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)

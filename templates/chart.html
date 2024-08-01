@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Weather Charts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .header-container {
+            background-color: #0078D7;
+            padding: 10px;
+            color: white;
+            text-align: center;
+        }
+        .chart-container {
+            margin-top: 20px;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 500px !important;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+        }
+        .map-container {
+            margin-bottom: 20px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="header-container">
+        <div>Weather Forecast Charts</div>
+    </div>
+
+    <div class="container">
+        <div class="map-container">
+            <iframe src="osm_widget.html" width="100%" height="500px" style="border: none;"></iframe>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="temperatureChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="precipitationChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let temperatureChart, precipitationChart;
+
+        window.addEventListener('message', function(event) {
+            if (event.data.latitude && event.data.longitude) {
+                fetchWeatherData(event.data.latitude, event.data.longitude);
+            }
+        });
+
+        function fetchWeatherData(lat, lon) {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&start_date=${getTodayDate()}&end_date=${getEndDate(7)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const dates = [];
+                    const maxTemps = [];
+                    const minTemps = [];
+                    const precipitations = [];
+
+                    data.daily.time.forEach((date, index) => {
+                        dates.push(formatDate(date, index === data.daily.time.length - 1));
+                        maxTemps.push(Math.round(data.daily.temperature_2m_max[index]));
+                        minTemps.push(Math.round(data.daily.temperature_2m_min[index]));
+                        precipitations.push(Math.round(data.daily.precipitation_sum[index]));
+                    });
+
+                    updateTemperatureChart(dates, maxTemps, minTemps);
+                    updatePrecipitationChart(dates, precipitations);
+                })
+                .catch(error => console.error('Error fetching weather data:', error));
+        }
+
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function getEndDate(days) {
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + days);
+            return endDate.toISOString().split('T')[0];
+        }
+
+        function formatDate(dateString, isLastDay) {
+            const date = new Date(dateString);
+            const today = new Date();
+            if (date.toDateString() === today.toDateString()) {
+                return "Today";
+            } else {
+                const options = { weekday: 'long' };
+                const dayName = date.toLocaleDateString(undefined, options);
+                return isLastDay ? `Next ${dayName}` : dayName;
+            }
+        }
+
+        function updateTemperatureChart(dates, maxTemps, minTemps) {
+            const ctx = document.getElementById('temperatureChart').getContext('2d');
+            if (temperatureChart) {
+                temperatureChart.destroy();
+            }
+            temperatureChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Max Temperature (°C)',
+                            data: maxTemps,
+                            borderColor: 'red',
+                            fill: false
+                        },
+                        {
+                            label: 'Min Temperature (°C)',
+                            data: minTemps,
+                            borderColor: 'blue',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Temperature (°C)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updatePrecipitationChart(dates, precipitations) {
+            const ctx = document.getElementById('precipitationChart').getContext('2d');
+            if (precipitationChart) {
+                precipitationChart.destroy();
+            }
+            precipitationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Precipitation (mm)',
+                            data: precipitations,
+                            backgroundColor: 'blue',
+                            borderColor: 'blue',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Precipitation (mm)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

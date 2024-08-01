@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Weather Forecast</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-
 <body>
     <!-- Blue strip header -->
     <div class="header-container main-header">
@@ -25,8 +23,7 @@
         </div>
     </div>
     <!-- Name of city -->
-    <div class="city-name-container" id="cityDisplay">
-    </div>
+    <div class="city-name-container" id="cityDisplay"></div>
     <!-- Day picker -->
     <div class="day-selector">
         <div class="day-box" id="day-1">Today</div>
@@ -39,43 +36,35 @@
     </div>
     <!-- Hourly view container -->
     <div class="hourly-view-container">
-        <div class="weather-container" id="weatherContainer">
-            <!-- Boxes will be added here dynamically -->
-        </div>
+        <div class="weather-container" id="weatherContainer"></div>
     </div>
 
     <script>
-        var selectedDate = getTodayDate();
-        var currentLatitude = null;
-        var currentLongitude = null;
-
+        let selectedDate = getTodayDate();
+        let currentLatitude = null;
+        let currentLongitude = null;
+    
         function getTodayDate() {
-            var today = new Date();
+            const today = new Date();
             return today.toISOString().split('T')[0];
         }
-
+    
         function getFutureDate(days) {
-            var futureDate = new Date();
+            const futureDate = new Date();
             futureDate.setDate(futureDate.getDate() + days);
             return futureDate.toISOString().split('T')[0];
         }
-
-        function formatDate(dateString) {
-            var date = new Date(dateString);
-            var options = { weekday: 'long', month: 'long', day: 'numeric' };
-            return date.toLocaleDateString(undefined, options);
-        }
-
+    
         function getDayName(daysAfterToday) {
-            var date = new Date();
+            const date = new Date();
             date.setDate(date.getDate() + daysAfterToday);
-            var options = { weekday: 'long' };
-            var dayName = date.toLocaleDateString(undefined, options).slice(0, 3);
-            var day = date.getDate();
-            var daySuffix = getDaySuffix(day);
+            const options = { weekday: 'long' };
+            const dayName = date.toLocaleDateString(undefined, options).slice(0, 3);
+            const day = date.getDate();
+            const daySuffix = getDaySuffix(day);
             return `${dayName} ${day}${daySuffix}`;
         }
-
+    
         function getDaySuffix(day) {
             if (day >= 11 && day <= 13) {
                 return 'th';
@@ -87,14 +76,14 @@
                 default: return 'th';
             }
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
+    
+        function updateDayBoxes() {
             const dayBoxes = document.querySelectorAll('.day-box');
             dayBoxes.forEach((box, index) => {
                 const date = getFutureDate(index);
                 box.setAttribute('data-date', date);
                 box.textContent = index === 0 ? "Today" : getDayName(index);
-
+    
                 box.addEventListener('click', () => {
                     dayBoxes.forEach(b => b.classList.remove('selected', 'unselected'));
                     box.classList.add('selected');
@@ -103,83 +92,188 @@
                             b.classList.add('unselected');
                         }
                     });
-
+    
                     selectedDate = box.getAttribute('data-date');
-
+    
                     if (currentLatitude && currentLongitude) {
                         fetchWeatherDataHourly(currentLatitude, currentLongitude, selectedDate);
                     }
                 });
             });
-
-            document.getElementById('day-1').click();
-        });
-
+        }
+    
         async function fetchWeatherDataHourly(lat, lon, date) {
             try {
                 const response = await fetch(`/getHourlyWeather?latitude=${lat}&longitude=${lon}&date=${date}`);
                 const data = await response.json();
                 const weatherContainer = document.getElementById('weatherContainer');
                 weatherContainer.innerHTML = '';
-
+    
                 data.hourly.time.forEach((time, index) => {
                     const box = document.createElement('div');
                     box.className = 'box';
-
+    
                     const timeDiv = document.createElement('div');
                     timeDiv.className = 'time';
                     timeDiv.textContent = new Date(time).getHours() + ':00';
                     box.appendChild(timeDiv);
-
+    
+                    const iconDiv = document.createElement('div');
+                    iconDiv.className = 'icon';
+                    iconDiv.textContent = getWeatherEmoji(data.hourly.weather_code[index]);
+                    box.appendChild(iconDiv);
+    
                     const tempDiv = document.createElement('div');
                     tempDiv.className = 'temp';
-                    tempDiv.textContent = `${Math.round(data.hourly.temperature_2m[index])}°C`;
+                    tempDiv.textContent = Math.round(data.hourly.temperature_2m[index]).toString() + "°";
                     box.appendChild(tempDiv);
-
-                    const precipDiv = document.createElement('div');
-                    precipDiv.className = 'precipitation';
-                    precipDiv.textContent = `${Math.round(data.hourly.precipitation_sum[index])} mm`;
-                    box.appendChild(precipDiv);
-
+    
                     const windDiv = document.createElement('div');
                     windDiv.className = 'wind';
-                    windDiv.textContent = `${Math.round(data.hourly.windspeed_10m[index])} km/h`;
+                    windDiv.textContent = Math.round(data.hourly.windspeed_10m[index]).toString() + "km/h";
                     box.appendChild(windDiv);
-
+    
                     weatherContainer.appendChild(box);
                 });
             } catch (error) {
                 console.error('Error fetching hourly weather data:', error);
             }
         }
-
+    
+        async function fetchWeatherDataForLondon() {
+            try {
+                // Coordinates for London
+                const londonLat = 51.5074;
+                const londonLon = -0.1278;
+    
+                currentLatitude = londonLat;
+                currentLongitude = londonLon;
+    
+                // Fetch and display weather data for today
+                fetchWeatherDataHourly(londonLat, londonLon, getTodayDate());
+    
+                // Set up day boxes and select today
+                updateDayBoxes();
+                document.getElementById('day-1').classList.add('selected');
+                document.querySelectorAll('.day-box').forEach(b => {
+                    if (!b.classList.contains('selected')) {
+                        b.classList.add('unselected');
+                    }
+                });
+                document.getElementById('cityDisplay').textContent = 'London, United Kingdom';
+            } catch (error) {
+                console.error('Error fetching weather data for London:', error);
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', () => {
+            // Update day boxes and show weather for today in London
+            fetchWeatherDataForLondon();
+        });
+    
         const searchBar = document.getElementById('searchBar');
         searchBar.addEventListener('keydown', async function(event) {
             if (event.key === 'Enter') {
-                event.preventDefault();
-
+                event.preventDefault(); // Prevent form submission
+    
                 const inputVal = searchBar.value;
                 try {
-                    const response = await fetch(`/getCoords?city_name=${inputVal}`);
+                    const geocodeApiKey = '1c212ed6db9141f3a94761a660c42644';
+                    const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${inputVal}&key=${geocodeApiKey}`);
                     const data = await response.json();
-                    const { latitude, longitude } = data;
-
-                    currentLatitude = latitude;
-                    currentLongitude = longitude;
-
-                    const cityNameResponse = await fetch(`/get_city_name?latitude=${latitude}&longitude=${longitude}`);
-                    const cityNameData = await cityNameResponse.json();
-                    const cityName = cityNameData.city;
-
-                    const cityNameContainer = document.getElementById('cityDisplay');
-                    cityNameContainer.textContent = cityName;
-
-                    fetchWeatherDataHourly(latitude, longitude, selectedDate);
+    
+                    if (data.results.length > 0) {
+                        const { lat, lng } = data.results[0].geometry;
+                        currentLatitude = lat;
+                        currentLongitude = lng;
+    
+                        document.getElementById('cityDisplay').textContent = data.results[0].formatted;
+    
+                        fetchWeatherDataWeek(lat, lng);
+                        const firstDayBox = document.getElementById('day-1');
+                        selectedDate = firstDayBox.getAttribute('data-date');
+                        fetchWeatherDataHourly(lat, lng, selectedDate);
+    
+                        updateDayBoxes();
+                        firstDayBox.classList.add('selected');
+                        document.querySelectorAll('.day-box').forEach(b => {
+                            if (!b.classList.contains('selected')) {
+                                b.classList.add('unselected');
+                            }
+                        });
+                    } else {
+                        console.error('No results found for the location.');
+                    }
                 } catch (error) {
-                    console.error('Error fetching coordinates or city name:', error);
+                    console.error('Error fetching coordinates:', error);
                 }
             }
         });
+    
+        function fetchWeatherDataWeek(lat, lon) {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto&start_date=${getTodayDate()}&end_date=${getEndDate(7)}`;
+    
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // Process weekly data if needed
+                })
+                .catch(error => console.error('Error fetching weekly weather data:', error));
+        }
+    
+        function getEndDate(days) {
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + days);
+            return endDate.toISOString().split('T')[0];
+        }
+    
+        function getWeatherEmoji(code) {
+            switch (code) {
+                case 0:
+                    return '☀️'; // Clear sky
+                case 1:
+                case 2:
+                case 3:
+                    return '⛅'; // Mainly clear, partly cloudy, and overcast
+                case 45:
+                case 48:
+                    return '🌫️'; // Fog and depositing rime fog
+                case 51:
+                case 53:
+                case 55:
+                    return '🌦️'; // Drizzle: Light, moderate, and dense intensity
+                case 56:
+                case 57:
+                    return '🌧️'; // Freezing Drizzle: Light and dense intensity
+                case 61:
+                case 63:
+                case 65:
+                    return '🌧️'; // Rain: Slight, moderate and heavy intensity
+                case 66:
+                case 67:
+                    return '🌨️'; // Freezing Rain: Light and heavy intensity
+                case 71:
+                case 73:
+                case 75:
+                    return '🌨️'; // Snow fall: Slight, moderate, and heavy intensity
+                case 77:
+                    return '🌨️'; // Snow grains
+                case 80:
+                case 81:
+                case 82:
+                    return '🌦️'; // Rain showers: Slight, moderate, and violent
+                case 85:
+                case 86:
+                    return '🌨️'; // Snow showers slight and heavy
+                case 95:
+                    return '⛈️'; // Thunderstorm: Slight or moderate
+                case 96:
+                case 99:
+                    return '🌩️'; // Thunderstorm with slight and heavy hail
+                default:
+                    return '❓'; // Unknown weather code
+            }
+        }
     </script>
 </body>
 </html>
