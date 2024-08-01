@@ -20,58 +20,78 @@ th {
     background-color: #f2f2f2;
 }
 
+/* TOP BLUE STRIP */
 .header-container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
+    position: fixed;
     top: 0;
     left: 0;
+    z-index: 1000;
+}
+
+.main-header {
     background-color: rgb(43, 145, 240);
+}
+
+.nav-header {
+    background-color: transparent;
+    justify-content: center;
+    pointer-events: none; /* Make the overlay invisible to mouse events */
 }
 
 .header-content {
     font-weight: bold;
-    font-size: xx-large;
+    font-size: 300%;
     color: white;
-    z-index: 1000;
 }
 
 .nav-buttons {
     display: flex;
-    gap: 10px;
+    pointer-events: all; /* Allow interactions with nav buttons */
 }
 
 .nav-button {
     text-decoration: none;
     color: white;
     background-color: #0056b3;
-    padding: 10px 20px;
+    padding: 10px 15px;
     border-radius: 5px;
     font-weight: bold;
     font-size: large;
     transition: background-color 0.3s ease;
+    margin: 0 5px;
 }
 
 .nav-button:hover {
     background-color: #003d80;
 }
 
+.search-form {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
 .location-input-box {
     width: 30vw;
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: large;
+    border-radius: 5px;
+    font-size: x-large;
 }
+
 
 .city-name-container {
     font-weight: bold;
     font-size: xx-large;
     color: black;
     margin-top: 100px;
+    margin-bottom: 10px;
     padding: 20px;
     background-color: antiquewhite;
 }
@@ -128,6 +148,7 @@ th {
 .day-box.selected {
     flex: 2; /* Expand selected box */
     background-color: #0056b3;
+    color: white;
 }
 
 .day-box.unselected {
@@ -152,3 +173,4 @@ th {
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
     border-radius: 10%;
 }
+
