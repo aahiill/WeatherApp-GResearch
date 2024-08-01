@@ -5,19 +5,58 @@ body {
     padding: 20px;
 }
 
-table {
+/* TOP BLUE STRIP */
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
-    border-collapse: collapse;
+    padding: 20px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
 }
 
-th, td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+.main-header {
+    background-color: rgb(43, 145, 240);
 }
 
-th {
-    background-color: #f2f2f2;
+.nav-header {
+    background-color: transparent;
+    justify-content: center;
+    pointer-events: none; /* Make the overlay invisible to mouse events */
+}
+
+.header-content {
+    font-weight: bold;
+    font-size: 300%;
+    color: white;
+}
+
+.nav-buttons {
+    display: flex;
+    pointer-events: all; /* Allow interactions with nav buttons */
+}
+
+.nav-button {
+    text-decoration: none;
+    color: white;
+    background-color: #0056b3;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: x-large;
+    transition: background-color 0.3s ease;
+    margin: 0 5px;
+    transform: translateY(7%); /* Adjust for vertical centering */
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+    
 }
 
 /* TOP BLUE STRIP */
@@ -65,6 +104,8 @@ th {
     font-size: large;
     transition: background-color 0.3s ease;
     margin: 0 5px;
+    height: 40px;
+    align-items: center;
 }
 
 .nav-button:hover {
@@ -75,6 +116,207 @@ th {
     flex-grow: 1;
     display: flex;
     justify-content: flex-end;
+}
+
+.location-input-box {
+    width: 30vw;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: x-large;
+}
+
+
+.city-name-container {
+    font-weight: bold;
+    font-size: xx-large;
+    color: black;
+    margin-top: 100px;
+    margin-bottom: 10px;
+    padding: 20px;
+    background-color: antiquewhite;
+}
+
+.hourly-view-container {
+    font-weight: bold;
+    font-size: xx-large;
+    color: black;
+    background-color: beige;
+    margin-top: 40px;
+    padding: 20px;
+}
+
+.dual-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #f0f0f0;
+}
+
+.dual-container .content {
+    width: 48%;
+    height: auto;
+    background-color: #ec1cff;
+    padding: 10px;
+}
+
+.day-selector {
+    display: flex;
+    gap: 10px;
+}
+.day-box:hover {
+    background-color: #0056b3;
+}
+
+.day-box.selected {
+    flex: 2; /* Expand selected box */
+    background-color: #0056b3;
+    color: white;
+}
+
+.day-box.unselected {
+    flex: 1; /* Shrink unselected boxes */
+    opacity: 0.7;
+}
+
+
+/* NEW FEATURE */
+.day-box {
+    font-weight: bold;
+    font-size: xx-large;
+    color: black;
+    background-color: beige;
+    margin-top: 40px;
+    padding: 20px;
+    flex: 1;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.day-box .content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.day-box .icon {
+    flex: 0 0 30%; /* Adjust the width of the icon as needed */
+}
+
+.day-box .temps {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    height: 100%; /* Make sure it takes the full height of the day-box */
+}
+
+.temp-max, .temp-min {
+    font-size: medium; /* Adjust the font size as needed */
+}
+
+
+
+/* HOURLY VIEW */
+.weather-container {
+    display: flex;
+    padding: 10px;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent line breaks */
+}
+
+.box {
+    font-size: xx-large;
+    flex: 0 0 auto; /* Prevent the flex items from shrinking */
+    width: 100px; /* Adjust width as needed */
+    margin: 0 5px; /* Add horizontal margin for spacing */
+    padding: 10px;
+    text-align: center;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    border-radius: 10%;
+}
+
+.box .time, 
+.box .icon, 
+.box .temp, 
+.box .precipitation, 
+.box .wind {
+    margin-bottom: 13px; /* Add vertical margin to create spacing */
+}
+
+
+
+.precipitation {
+    /* Add styles for the precipitation div */
+    font-size: 27px;
+    color: rgb(106, 106, 106);
+}
+
+.wind {
+    /* Add styles for the wind div */
+    font-size: 27px;
+    color: rgb(106, 106, 106);
+}
+
+.box.current-hour {
+    background-color: rgb(194, 194, 194);
+    color: white;
+}
+
+.box.current-hour .wind {
+    color: white;
+}
+
+/* Styles for the location button */
+.location-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px; /* Add padding around the button */
+    margin-left: 10px; /* Space between search bar and button */
+    border-radius: 5px; /* Optional: rounded corners */
+    border: 2px solid #0056b3; /* Border around the button */
+    background-color: #0056b3; /* Darker blue background for button */
+    color: white;
+}
+
+/* Style for the marker icon */
+.location-button img {
+    width: 24px; /* Adjust size as needed */
+    height: auto;
+    padding: 5px; /* Padding inside the image, making the border more visible */
+}
+
+/* Search icon styling */
+.search-icon {
+    position: absolute; /* Position the icon absolutely within the container */
+    right: 10px; /* Position the icon 10 pixels from the right edge */
+    top: 50%; /* Vertically center the icon */
+    transform: translateY(-50%); /* Adjust for vertical centering */
+    width: 24px; /* Set the size of the icon */
+    height: 24px; /* Ensure height matches the width */
+    object-fit: contain; /* Maintain aspect ratio */
+    margin-left: 0
+}
+}
+
+.nav-button:hover {
+    background-color: #003d80;
+}
+
+.search-form {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
+    height: 50px;
 }
 
 .location-input-box {
@@ -197,4 +439,69 @@ th {
     /* Add styles for the wind div */
     font-size: 27px;
     color: rgb(106, 106, 106);
+}
+
+.box.current-hour {
+    background-color: rgb(194, 194, 194);
+    color: white;
+}
+
+.box.current-hour .wind {
+    color: white;
+}
+
+/* Styles for the location button */
+.location-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px; /* Add padding around the button */
+    margin-left: 10px; /* Space between search bar and button */
+    border-radius: 5px; /* Optional: rounded corners */
+    border: 2px solid #0056b3; /* Border around the button */
+    background-color: #0056b3; /* Darker blue background for button */
+}
+
+/* Style for the marker icon */
+.location-button img {
+    width: 24px; /* Adjust size as needed */
+    height: auto;
+    padding: 5px; /* Padding inside the image, making the border more visible */
+}
+
+/* Search icon styling */
+.search-icon {
+    position: absolute; /* Position the icon absolutely within the container */
+    right: 10px; /* Position the icon 10 pixels from the right edge */
+    top: 50%; /* Vertically center the icon */
+    transform: translateY(-50%); /* Adjust for vertical centering */
+    width: 24px; /* Set the size of the icon */
+    height: 24px; /* Ensure height matches the width */
+    object-fit: contain; /* Maintain aspect ratio */
+    margin-left: 0
+}
+
+/* Style for the search input container */
+.search-input-container {
+    position: relative;
+}
+
+/* Style for the datalist dropdown options */
+#locationSuggestions {
+    max-height: 200px; /* Adjust the height as needed */
+    overflow-y: auto;  /* Enable vertical scrolling */
+}
+
+#chartButton {
+    font-weight: bold;
+    font-size: xx-large;
+    color: white;
+    background-color: #0056b3;
+    margin-top: 40px;
+    padding: 20px;
+    flex: 1;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 5px;
 }

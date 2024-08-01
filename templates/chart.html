@@ -3,66 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Weather Charts</title>
+    <title>Weather Forecast</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌤️</text></svg>">
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             margin: 0;
-            padding: 20px;
-        }
-        .header-container {
-            background-color: #0078D7;
             padding: 10px;
-            color: white;
-            text-align: center;
         }
+
         .chart-container {
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .chart-container canvas {
-            width: 100% !important;
-            height: 500px !important;
+            width: 45vw !important;
         }
         .container {
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
         .map-container {
-            margin-bottom: 20px;
+            margin-top: 10vh;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="header-container">
-        <div>Weather Forecast Charts</div>
+    <!-- Blue strip header -->
+    <div class="header-container main-header">
+        <div class="header-content">WEATHER</div>
+        <form action="/" method="get" class="search-form">
+            <div class="search-input-container">
+                <input type="text" class="location-input-box" id="searchBar" name="location" placeholder="Enter location..." value="{{ location }}">
+            </div>
+            <button type="button" id="locationButton" class="location-button">
+                📍
+            </button>
+            <input type="submit" style="display: none;">
+        </form>      
     </div>
-
-    <div class="container">
-        <div class="map-container">
-            <iframe src="osm_widget.html" width="100%" height="500px" style="border: none;"></iframe>
+    <div class="city-name-container" id="cityDisplay"></div>    
+    <!-- Invisible header for nav buttons -->
+    <div class="header-container nav-header">
+        <div class="nav-buttons">
+            <a href="/" class="nav-button">Home</a>
+            <a href="{{ url_for('map') }}" class="nav-button">Map</a>
         </div>
-
+    </div>
+    <div class="container">
+        <iframe src="/osm_widget" style="border: none; width: 90vw; height: 60vh;"></iframe>
         <div class="chart-container">
             <canvas id="temperatureChart"></canvas>
-        </div>
-        <div class="chart-container">
             <canvas id="precipitationChart"></canvas>
+            <canvas id="windSpeedChart"></canvas>
         </div>
     </div>
 
     <script>
-        let temperatureChart, precipitationChart;
+        let temperatureChart, precipitationChart, windSpeedChart;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const londonLat = 51.5074;
+            const londonLon = -0.1278;
+
+            fetchWeatherData(londonLat, londonLon);
+            fetchCityName(londonLat, londonLon);
+    });
 
         window.addEventListener('message', function(event) {
             if (event.data.latitude && event.data.longitude) {
                 fetchWeatherData(event.data.latitude, event.data.longitude);
+                fetchCityName(event.data.latitude, event.data.longitude);
             }
         });
 
         function fetchWeatherData(lat, lon) {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&start_date=${getTodayDate()}&end_date=${getEndDate(7)}`;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=auto&start_date=${getTodayDate()}&end_date=${getEndDate(7)}`;
 
             fetch(url)
                 .then(response => response.json())
@@ -71,16 +94,19 @@
                     const maxTemps = [];
                     const minTemps = [];
                     const precipitations = [];
+                    const windSpeeds = [];
 
                     data.daily.time.forEach((date, index) => {
                         dates.push(formatDate(date, index === data.daily.time.length - 1));
                         maxTemps.push(Math.round(data.daily.temperature_2m_max[index]));
                         minTemps.push(Math.round(data.daily.temperature_2m_min[index]));
                         precipitations.push(Math.round(data.daily.precipitation_sum[index]));
+                        windSpeeds.push(Math.round(data.daily.windspeed_10m_max[index]));
                     });
 
                     updateTemperatureChart(dates, maxTemps, minTemps);
                     updatePrecipitationChart(dates, precipitations);
+                    updateWindSpeedChart(dates, windSpeeds);
                 })
                 .catch(error => console.error('Error fetching weather data:', error));
         }
@@ -193,6 +219,67 @@
                 }
             });
         }
+
+
+        function updateWindSpeedChart(dates, windSpeeds) {
+            const ctx = document.getElementById('windSpeedChart').getContext('2d');
+            if (windSpeedChart) {
+                windSpeedChart.destroy();
+            }
+            windSpeedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Wind Speed (km/h)',
+                            data: windSpeeds,
+                            borderColor: 'green',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Wind Speed (km/h)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+
+        function fetchCityName(lat, lon) {
+        const apiKey = '1c212ed6db9141f3a94761a660c42644'; // Replace with your OpenCage API key
+        const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${lat},${lon}&key=${apiKey}`;
+
+        fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.results.length > 0) {
+                const location = data.results[0];
+                document.getElementById('cityDisplay').textContent = location.formatted;
+            } else {
+                console.error('No results found for the coordinates.');
+            }
+        })
+        .catch(error => console.error('Error fetching location data:', error));
+    }
+    
     </script>
 </body>
 </html>
