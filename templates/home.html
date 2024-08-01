@@ -13,8 +13,13 @@
     <!-- Blue strip header -->
     <div class="header-container main-header">
         <div class="header-content">WEATHER</div>
-        <form class="search-form" id="searchForm">
-            <input type="text" class="location-input-box" id="searchBar" name="location" placeholder="Enter location...">
+        <form action="/" method="get" class="search-form">
+            <div class="search-input-container">
+                <input type="text" class="location-input-box" id="searchBar" name="location" placeholder="Enter location..." value="{{ location }}">
+            </div>
+            <button type="button" id="locationButton" class="location-button">
+                📍
+            </button>
             <input type="submit" style="display: none;">
         </form>      
     </div>
