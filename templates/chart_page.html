@@ -5,60 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Forecast</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌤️</text></svg>">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 10px;
-        }
-
-        .chart-container {
-            margin-top: 10px;
-        }
-        .chart-container canvas {
-            width: 45vw !important;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .map-container {
-            margin-top: 10vh;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;
-        }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../scripts/scriptUtils.js"></script>
 </head>
 <body>
-    <!-- Blue strip header -->
-    <div class="header-container main-header">
-        <div class="header-content">WEATHER</div>
-        <form action="/" method="get" class="search-form">
-            <div class="search-input-container">
-                <input type="text" class="location-input-box" id="searchBar" name="location" placeholder="Enter location..." value="{{ location }}">
-            </div>
-            <button type="button" id="locationButton" class="location-button">
-                📍
-            </button>
-            <input type="submit" style="display: none;">
+    <div class="main-header">
+        <div style="font-weight: bold;font-size: 300%;color: white;">WEATHER</div>
+        <form id="searchForm">
+            <input type="text" id="searchBar" placeholder="Enter location..." value="{{ location }}">
+            <button type="button" id="locationButton">📍</button>
         </form>      
     </div>
-    <div class="city-name-container" id="cityDisplay"></div>    
-    <!-- Invisible header for nav buttons -->
-    <div class="header-container nav-header">
+    <div id="navHeader">
         <div class="nav-buttons">
             <a href="/" class="nav-button">Home</a>
-            <a href="{{ url_for('map') }}" class="nav-button">Map</a>
+            <a href="{{ url_for('map_page') }}" class="nav-button">Map</a>
         </div>
     </div>
+    <div id="cityDisplay"></div>    
+
     <div class="container">
-        <iframe src="/osm_widget" style="border: none; width: 98vw; height: 60vh;"></iframe>
+        <iframe id="mapWidget" src="/osm_widget" style="border: none; width: 50vw;height: 50vh;"></iframe>
         <div class="chart-container">
             <canvas id="temperatureChart"></canvas>
             <canvas id="precipitationChart"></canvas>
@@ -75,8 +43,23 @@
 
             fetchWeatherData(londonLat, londonLon);
             fetchCityName(londonLat, londonLon);
-    });
+        });
 
+        document.getElementById('locationButton').addEventListener('click', () => {
+            // Check if Geolocation is supported
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    fetchWeatherData(lat, lon);
+                    fetchCityName(lat, lon);
+                    
+                    // Send coordinates to the map iframe
+                    const iframe = document.getElementById('mapWidget');
+                    iframe.contentWindow.postMessage({ latitude: lat, longitude: lon }, '*');
+                });
+            }
+        });
         window.addEventListener('message', function(event) {
             if (event.data.latitude && event.data.longitude) {
                 fetchWeatherData(event.data.latitude, event.data.longitude);
@@ -109,28 +92,6 @@
                     updateWindSpeedChart(dates, windSpeeds);
                 })
                 .catch(error => console.error('Error fetching weather data:', error));
-        }
-
-        function getTodayDate() {
-            return new Date().toISOString().split('T')[0];
-        }
-
-        function getEndDate(days) {
-            const endDate = new Date();
-            endDate.setDate(endDate.getDate() + days);
-            return endDate.toISOString().split('T')[0];
-        }
-
-        function formatDate(dateString, isLastDay) {
-            const date = new Date(dateString);
-            const today = new Date();
-            if (date.toDateString() === today.toDateString()) {
-                return "Today";
-            } else {
-                const options = { weekday: 'long' };
-                const dayName = date.toLocaleDateString(undefined, options);
-                return isLastDay ? `Next ${dayName}` : dayName;
-            }
         }
 
         function updateTemperatureChart(dates, maxTemps, minTemps) {
@@ -220,7 +181,6 @@
             });
         }
 
-
         function updateWindSpeedChart(dates, windSpeeds) {
             const ctx = document.getElementById('windSpeedChart').getContext('2d');
             if (windSpeedChart) {
@@ -261,25 +221,50 @@
             });
         }
 
-
-
         function fetchCityName(lat, lon) {
-        const apiKey = '1c212ed6db9141f3a94761a660c42644'; // Replace with your OpenCage API key
-        const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${lat},${lon}&key=${apiKey}`;
+            const apiKey = '1c212ed6db9141f3a94761a660c42644';
+            const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${lat},${lon}&key=${apiKey}`;
 
-        fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data.results.length > 0) {
-                const location = data.results[0];
-                document.getElementById('cityDisplay').textContent = location.formatted;
-            } else {
-                console.error('No results found for the coordinates.');
-            }
-        })
-        .catch(error => console.error('Error fetching location data:', error));
-    }
+            fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.results.length > 0) {
+                    const location = data.results[0];
+                    document.getElementById('cityDisplay').textContent = location.formatted;
+                } else {
+                    console.error('No results found for the coordinates.');
+                }
+            })
+            .catch(error => console.error('Error fetching location data:', error));
+        }
+        const searchBar = document.getElementById('searchBar');
+        searchBar.addEventListener('keydown', async function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission
     
+                const inputVal = searchBar.value;
+                try {
+                    const geocodeApiKey = '1c212ed6db9141f3a94761a660c42644';
+                    const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${inputVal}&key=${geocodeApiKey}`);
+                    const data = await response.json();
+                    if (data.results.length > 0) {
+                        const { lat, lng } = data.results[0].geometry;
+                        currentLatitude = lat;
+                        currentLongitude = lng;
+    
+                        document.getElementById('cityDisplay').textContent = data.results[0].formatted;
+                        const iframe = document.getElementById('mapWidget');
+                        iframe.contentWindow.postMessage({ latitude: currentLatitude, longitude: currentLongitude }, '*');
+                        fetchWeatherData(currentLatitude, currentLongitude);
+                    } else {
+                        console.error('No results found for the location.');
+                    }
+                } catch (error) {
+                    console.error(' Error fetching coordinates:', error);
+                }
+            }
+        });
+
     </script>
 </body>
 </html>

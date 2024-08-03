@@ -2,38 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌤️</text></svg>">
     <title>OSM</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        #map {
+            box-sizing: border-box;
+            border: 1px solid black;
+            height: calc(100% - 2px);
+            width: calc(100% - 2px);
+        }
+    </style>
 </head>
 <body>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-<!-- Favicon -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌤️</text></svg>">
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<style>
-  #map {
-    border: 2px solid black;
-    height: 80vh;
-  }
-</style>
-<div id="map"></div>
-<script>
-  var map = L.map('map').setView([51.505, -0.09], 12);
+    <div id="map" style="box-sizing: border-box;border: 1px solid black;height: calc(100% - 2px);width: calc(100% - 2px);"></div>
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 12);
 
-  var marker = L.marker([51.505, -0.09], { draggable: true }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
 
-  function onMarkerDragEnd(e) {
-    var latlng = e.target.getLatLng();
-    // alert("Coordinates: " + latlng.lat + ", " + latlng.lng);
-    console.log(latlng.lat, latlng.lng);
-    window.parent.postMessage({ latitude: latlng.lat, longitude: latlng.lng }, '*');
-  }
+        var marker = L.marker([51.505, -0.09], { draggable: true }).addTo(map);
 
-  marker.on('dragend', onMarkerDragEnd);
-</script>
+        function onMarkerDragEnd(e) {
+            var latlng = e.target.getLatLng();
+            window.parent.postMessage({ latitude: latlng.lat, longitude: latlng.lng }, '*');
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data.latitude && event.data.longitude) {
+                var lat = event.data.latitude;
+                var lon = event.data.longitude;
+                
+                // Update marker position
+                marker.setLatLng([lat, lon]);
+
+                // Center the map on the new marker position
+                map.setView([lat, lon], map.getZoom());
+            }
+        });
+
+        marker.on('dragend', onMarkerDragEnd);
+    </script>
 </body>
 </html>
